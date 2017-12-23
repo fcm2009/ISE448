@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import papa from 'papaparse'
 
+let cands = []
 
 const nst = seed => {
   let tardnes = []
@@ -24,6 +25,7 @@ const nst = seed => {
   if (minTardnes.objective === objective(seed)) {
     return minTardnes;
   } else {
+    cands.push({ nh: minTardnes.nh.map(job => job.job), objective: minTardnes.objective })
     return nst(minTardnes.nh);
   }
 }
@@ -36,7 +38,6 @@ const objective = nh => {
     let x = job.p - job.d + time
     tardnes = x < 0 ? 0 : tardnes + x
     time = time + job.p
-    console.log(tardnes, x, job.p, job.d)
   })
 
   return tardnes
@@ -54,7 +55,6 @@ class App extends Component {
   }
 
   handelFile(files) {
-    console.log('aaaaaaaaaaaaaaaaaaa')
     papa.parse(files[0], {
       header: true,
       dynamicTyping: true,
@@ -72,6 +72,15 @@ class App extends Component {
     return (
       <div className="App">
         <input type="file" onChange={e => this.handelFile(e.target.files)}></input>
+
+        <p className="App-intro">
+          Total Number of Iterations: {cands.length}
+        </p>
+        
+        <p className="App-intro">
+          Iterations: {cands.map(cand => JSON.stringify(cand.nh) + ' T = ' + cand.objective)}
+        </p>
+
         <p className="App-intro">
           Sequence: {JSON.stringify(this.state.nh.map(job => job.job))}
         </p>
